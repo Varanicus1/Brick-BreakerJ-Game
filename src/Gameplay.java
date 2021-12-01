@@ -10,22 +10,25 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Graphics2D;
 
+//Datei für alles Zeichnet, Erstellt, Kollision,Keylistener,Variablen, Ball, Paddle
 public class Gameplay extends JPanel implements KeyListener, ActionListener{
 
-    private boolean play=false;
-    private int score= 0;
-    private int totalBricks = 21;
+    //Variablen
+     boolean play=false;
+     int score= 0;
+     int totalBricks = 21;
 
-    private Timer timer;
-    private int delay = 8;
+     Timer timer;
+     int delay = 8;
     
-    private int playerX = 310;
+     int playerX = 310;
 
-    private int ballposX = 120, ballposY = 350;
-    private int ballXdir = -2, ballYdir = -3;
+     int ballposX = 120, ballposY = 350;
+     int ballXdir = -2, ballYdir = -3;
 
-    private MapGenerator map;
+     MapGenerator map;
     
+     //Konstruktor für erstellen des Arrays, Keylistener aufruf, erstellt ein timer/clock
     public Gameplay(){
         map = new MapGenerator(3, 7);
         addKeyListener(this);
@@ -34,13 +37,15 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         timer = new Timer(delay,this);
         timer.start();
     } 
-
+   
+     //Zeichnen der Gegenstände
     public void paint(Graphics g){
+
         //background
         g.setColor(Color.black);
         g.fillRect(1, 1, 692, 592);
 
-        //drawing map
+        //drawing bricks
         map.draw((Graphics2D) g);
 
         //borders
@@ -62,6 +67,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         g.setColor(Color.yellow);
         g.fillOval(ballposX, ballposY, 20, 20);
 
+        //Siegesanimation
         if(totalBricks <= 0){
             play= false;
             ballXdir = 0;
@@ -74,6 +80,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
             g.drawString("Press Enter to Restart" ,230, 350); 
         }
 
+        //Verlierer Animation
         if(ballposY > 570){
             play= false;
             ballXdir = 0;
@@ -93,30 +100,38 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
     
 
 
-
+    //Ballbewegung und Kollisionsprüfung
     @Override
     public void actionPerformed(ActionEvent e) {
         timer.start();
-
+        
+        //Kollisionspürfung mit dem paddle
         if(play){
         if(new Rectangle(ballposX,ballposY,20,20).intersects(new Rectangle(playerX,550,100,8))){
             ballYdir = -ballYdir;
         }
-        A: for(int i =0; i<map.map.length; i++){
+        
+        //Kollisionsprüfung mit den Bricks
+        A: for(int i =0; i<map.map.length; i++){ //Initiale Array aus MapGenerator
             for(int j =0; j<map.map[0].length; j++){
-                if(map.map[i][j]>0){
+                if(map.map[i][j]>0){//solange noch Bricks übrig
+
+                    //Kordinaten und Größe jedes Bricks
                     int brickX = j*map.brickWidth + 80;
                     int brickY = i*map.brickHeight + 50;
                     int brickWidth = map.brickWidth ;
                     int brickHeight = map.brickHeight;
 
-                    Rectangle rect = new Rectangle(brickX, brickY,brickWidth, brickHeight);
-                    Rectangle ballRect = new Rectangle(ballposX,ballposY,20,20);
-                    Rectangle brickRect=rect;
+                    Rectangle rect = new Rectangle(brickX, brickY,brickWidth, brickHeight);//Bricks werden als rechtecke betrachtet
+                    Rectangle ballRect = new Rectangle(ballposX,ballposY,20,20);//Der runde Ball wird als rechteck betrachtet
+                    Rectangle brickRect=rect; //Arbeitsvariable für rect
 
+                    //Eigentlich Kolliosions abfrage mit den Bricks
                     if(ballRect.intersects(brickRect)){
+                        //Ein Brick wird gelöscht
                         map.setBrickValue(0, i, j);
                         totalBricks--;
+                        //Punkte werden erhöhht
                         score +=5;
                         
                         if(ballposX +19 <= brickRect.x || ballposX + 1 >= brickRect.x + brickRect.width){
@@ -131,9 +146,12 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
                 }
             
             }
-        }
+        }   
+            //Ballbewegung
             ballposX += ballXdir;
             ballposY += ballYdir;
+
+            //Kollisions Prüfung mit der Wand
             if(ballposX < 0){
                 ballXdir =-ballXdir;
             }
@@ -147,15 +165,19 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         repaint();
         
     }
-
+    
+    //KeyListener
     @Override
     public void keyTyped(KeyEvent e) {}
 
     @Override
     public void keyReleased(KeyEvent e) {}
 
+    
     @Override
     public void keyPressed(KeyEvent e) {
+
+        //Nach Rechts
         if(e.getKeyCode() == KeyEvent.VK_RIGHT){
             if(playerX >= 600){
                 playerX = 600;
@@ -164,6 +186,8 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
             }
 
         }
+
+        //Nach Links
         if(e.getKeyCode() == KeyEvent.VK_LEFT){
             if(playerX < 10){
                 playerX = 10;
@@ -171,6 +195,8 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
                 moveLeft();
             } 
         }
+
+        //Enter Reset von allem Spiel beginnt erneut
         if(e.getKeyCode() == KeyEvent.VK_ENTER){
             if(!play){
                 play= true;
@@ -180,23 +206,22 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
                 ballYdir = -3;
                 playerX= 310;
                 score = 0;
-                totalBricks = 21;
-                map = new MapGenerator(3, 7);
-
+                totalBricks = 28;
+                map = new MapGenerator(4, 7);
                 repaint();
             }
         }
     }
-
+    
+    //Rechts Bewegung
     public void moveRight(){
         play = true;
         playerX +=20;
     }
+
+    //Links Bewegung
     public void moveLeft(){
         play = true;
         playerX -=20;
-    }
-
-
-    
+    }  
 }

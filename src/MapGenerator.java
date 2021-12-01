@@ -4,9 +4,12 @@ import java.awt.BasicStroke;
 
 public class MapGenerator {
     
-    public int map[][];
+    //Variablen
+    public int map[][];//erstellt ein 2Dimensionales Array
     public int brickWidth;
     public int brickHeight;
+
+    //Konstruktor fühlt das Array mit den Angegeben Reihen und Spalten
     public MapGenerator(int row, int col){
         map = new int[row][col];
         for(int i = 0; i <map.length; i++){
@@ -17,6 +20,8 @@ public class MapGenerator {
         brickWidth = 540/col;
         brickHeight = 150/row;
     }
+
+    //Zeichnet die Bricks auf die Zeichenfläche welche Gameplay aufgerufen wird
     public void draw(Graphics2D g){
 
         for(int i = 0; i <map.length; i++){
